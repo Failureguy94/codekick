@@ -1,6 +1,8 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Code2, Brain, Globe, Database, Cpu, Terminal } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { Navigation } from "@/components/Navigation";
 
 const FloatingIcon = ({ icon: Icon, delay, x, y }: any) => (
   <motion.div
@@ -28,6 +30,7 @@ const FloatingIcon = ({ icon: Icon, delay, x, y }: any) => (
 
 const Home = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const floatingIcons = [
     { icon: Code2, delay: 0, x: 10, y: 20 },
@@ -40,6 +43,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
+      <Navigation />
+      
       {/* Animated Background Pattern */}
       <div className="absolute inset-0 bg-gradient-hero opacity-50" />
       
@@ -75,7 +80,7 @@ const Home = () => {
           </motion.p>
 
           <motion.button
-            onClick={() => navigate("/profile")}
+            onClick={() => navigate(user ? "/domains" : "/auth")}
             className="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -83,7 +88,7 @@ const Home = () => {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            Get Started
+            {user ? "Go to Domains" : "Get Started"}
           </motion.button>
         </motion.div>
 
