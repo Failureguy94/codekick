@@ -216,7 +216,7 @@ codekick/
 
 ### For Admins
 
-Access the admin panel to:
+Access the admin panel with password: `Maddy-Folks` to:
 - Update daily CP news and tutorials
 - Share latest AI/ML research papers
 - Keep content fresh and relevant
