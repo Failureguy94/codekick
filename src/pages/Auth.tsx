@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Chrome } from 'lucide-react';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -67,6 +68,23 @@ const Auth = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sign in with Google');
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
       <motion.div
@@ -90,6 +108,27 @@ const Auth = () => {
 
             <TabsContent value="signin">
               <form onSubmit={handleSignIn} className="space-y-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
+                  <Chrome className="w-5 h-5 mr-2" />
+                  Sign in with Google
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or continue with email
+                    </span>
+                  </div>
+                </div>
                 <div>
                   <Label htmlFor="signin-email">Email</Label>
                   <Input
@@ -124,6 +163,27 @@ const Auth = () => {
 
             <TabsContent value="signup">
               <form onSubmit={handleSignUp} className="space-y-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleGoogleSignIn}
+                  disabled={loading}
+                >
+                  <Chrome className="w-5 h-5 mr-2" />
+                  Sign up with Google
+                </Button>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-card px-2 text-muted-foreground">
+                      Or create account with email
+                    </span>
+                  </div>
+                </div>
                 <div>
                   <Label htmlFor="fullname">Full Name</Label>
                   <Input

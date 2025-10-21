@@ -76,7 +76,7 @@ const Profile = () => {
     <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5">
       <Navigation />
       
-      <div className="pt-24 pb-12 px-4 max-w-2xl mx-auto">
+      <div className="pt-24 pb-12 px-4 min-h-screen flex flex-col items-center justify-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -88,7 +88,7 @@ const Profile = () => {
           <p className="text-muted-foreground">Manage your information and connect with others</p>
         </motion.div>
 
-        <Card className="shadow-elegant">
+        <Card className="shadow-elegant w-full max-w-lg">
           <CardHeader>
             <CardTitle>Profile Information</CardTitle>
           </CardHeader>
