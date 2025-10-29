@@ -14,15 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      otp_verifications: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          expires_at: string
+          id: string
+          otp_code: string
+          phone_number: string
+          user_id: string
+          verified: boolean | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          expires_at: string
+          id?: string
+          otp_code: string
+          phone_number: string
+          user_id: string
+          verified?: boolean | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          expires_at?: string
+          id?: string
+          otp_code?: string
+          phone_number?: string
+          user_id?: string
+          verified?: boolean | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           bio: string | null
           coding_platform: string | null
+          country_code: string | null
           created_at: string | null
           full_name: string | null
           id: string
           linkedin: string | null
+          phone_number: string | null
+          phone_verified: boolean | null
           telegram: string | null
           updated_at: string | null
           username: string
@@ -31,10 +67,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           coding_platform?: string | null
+          country_code?: string | null
           created_at?: string | null
           full_name?: string | null
           id: string
           linkedin?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean | null
           telegram?: string | null
           updated_at?: string | null
           username: string
@@ -43,10 +82,13 @@ export type Database = {
           avatar_url?: string | null
           bio?: string | null
           coding_platform?: string | null
+          country_code?: string | null
           created_at?: string | null
           full_name?: string | null
           id?: string
           linkedin?: string | null
+          phone_number?: string | null
+          phone_verified?: boolean | null
           telegram?: string | null
           updated_at?: string | null
           username?: string
@@ -102,7 +144,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      cleanup_expired_otps: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
