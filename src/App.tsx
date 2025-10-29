@@ -8,6 +8,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AIChatbot } from "@/components/AIChatbot";
 import Home from "./pages/Home";
 import Auth from "./pages/Auth";
+import VerifyPhone from "./pages/VerifyPhone";
 import Profile from "./pages/Profile";
 import Domains from "./pages/Domains";
 import Discover from "./pages/Discover";
@@ -34,6 +35,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/verify-phone" element={<ProtectedRoute><VerifyPhone /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             <Route path="/domains" element={<ProtectedRoute><Domains /></ProtectedRoute>} />
             <Route path="/discover" element={<ProtectedRoute><Discover /></ProtectedRoute>} />
