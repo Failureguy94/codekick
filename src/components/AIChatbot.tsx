@@ -86,32 +86,41 @@ export const AIChatbot = () => {
             >
               {/* Main Avatar Sphere */}
               <div className="relative w-20 h-20">
-                {/* Glow effect background */}
+                {/* Enhanced multi-layer glow effect */}
                 <motion.div 
-                  className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 blur-xl opacity-60"
+                  className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 blur-2xl opacity-70"
                   animate={{
-                    scale: [1, 1.2, 1],
-                    opacity: [0.6, 0.8, 0.6],
+                    scale: [1, 1.3, 1],
+                    opacity: [0.7, 0.9, 0.7],
                   }}
                   transition={{
-                    duration: 2,
+                    duration: 2.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                <motion.div 
+                  className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-300 to-purple-400 blur-xl opacity-50"
+                  animate={{
+                    scale: [1.1, 1.4, 1.1],
+                    opacity: [0.5, 0.7, 0.5],
+                  }}
+                  transition={{
+                    duration: 3,
                     repeat: Infinity,
                     ease: "easeInOut",
                   }}
                 />
                 
-                {/* Main sphere */}
-                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 shadow-2xl overflow-hidden">
-                  {/* Shine effect */}
-                  <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/30 to-transparent" />
-                  
-                  {/* Inner glow */}
-                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-white/10 to-transparent backdrop-blur-sm" />
+                {/* Main sphere with clean gradient */}
+                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 via-purple-400 to-purple-500 shadow-2xl overflow-hidden">
+                  {/* Subtle top shine */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-white/20 via-transparent to-transparent" />
                   
                   {/* Eyes */}
-                  <div className="absolute top-6 left-0 right-0 flex justify-center gap-2">
+                  <div className="absolute top-6 left-0 right-0 flex justify-center gap-2.5">
                     <motion.div 
-                      className="w-2 h-2 rounded-full bg-white shadow-lg"
+                      className="w-2 h-2 rounded-full bg-white"
                       animate={{
                         scaleY: [1, 0.1, 1],
                       }}
@@ -122,7 +131,7 @@ export const AIChatbot = () => {
                       }}
                     />
                     <motion.div 
-                      className="w-2 h-2 rounded-full bg-white shadow-lg"
+                      className="w-2 h-2 rounded-full bg-white"
                       animate={{
                         scaleY: [1, 0.1, 1],
                       }}
@@ -136,41 +145,14 @@ export const AIChatbot = () => {
                   
                   {/* Smile */}
                   <motion.div 
-                    className="absolute bottom-5 left-1/2 -translate-x-1/2 w-6 h-3 border-b-2 border-white rounded-full"
+                    className="absolute bottom-5 left-1/2 -translate-x-1/2 w-7 h-3.5 border-b-2 border-white rounded-full"
                     animate={{
-                      scaleX: [1, 1.1, 1],
+                      scaleX: [1, 1.05, 1],
                     }}
                     transition={{
                       duration: 2,
                       repeat: Infinity,
                       ease: "easeInOut",
-                    }}
-                  />
-                  
-                  {/* Sparkles */}
-                  <motion.div
-                    className="absolute top-2 right-2 w-1 h-1 bg-white rounded-full"
-                    animate={{
-                      scale: [0, 1, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      repeatDelay: 1,
-                    }}
-                  />
-                  <motion.div
-                    className="absolute bottom-3 left-2 w-1 h-1 bg-white rounded-full"
-                    animate={{
-                      scale: [0, 1, 0],
-                      opacity: [0, 1, 0],
-                    }}
-                    transition={{
-                      duration: 1.5,
-                      repeat: Infinity,
-                      repeatDelay: 0.5,
-                      delay: 0.5,
                     }}
                   />
                 </div>
