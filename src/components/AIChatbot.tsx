@@ -65,12 +65,12 @@ export const AIChatbot = () => {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 w-96 h-[600px] bg-card rounded-2xl shadow-elegant border border-border flex flex-col z-50"
+            className="fixed bottom-24 right-6 w-96 h-[600px] bg-card rounded-2xl shadow-elegant border border-border flex flex-col z-50 overflow-visible"
             style={{ perspective: '1000px' }}
           >
             {/* 3D Floating Avatar */}
             <motion.div
-              className="absolute -top-10 -right-10 z-20"
+              className="absolute -top-8 right-4 z-20"
               animate={{
                 y: [0, -12, 0],
                 rotateY: [0, 15, 0, -15, 0],
