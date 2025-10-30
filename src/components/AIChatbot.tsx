@@ -66,8 +66,118 @@ export const AIChatbot = () => {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
             className="fixed bottom-24 right-6 w-96 h-[600px] bg-card rounded-2xl shadow-elegant border border-border flex flex-col z-50"
+            style={{ perspective: '1000px' }}
           >
-            <div className="flex items-center justify-between p-4 border-b border-border">
+            {/* 3D Floating Avatar */}
+            <motion.div
+              className="absolute -top-10 -right-10 z-20"
+              animate={{
+                y: [0, -12, 0],
+                rotateY: [0, 15, 0, -15, 0],
+                rotateX: [0, 8, 0, -8, 0],
+              }}
+              transition={{
+                y: { duration: 3, repeat: Infinity, ease: "easeInOut" },
+                rotateY: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+                rotateX: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+              }}
+              whileHover={{ scale: 1.15, rotateZ: 5 }}
+              style={{ transformStyle: 'preserve-3d' }}
+            >
+              {/* Main Avatar Sphere */}
+              <div className="relative w-20 h-20">
+                {/* Glow effect background */}
+                <motion.div 
+                  className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 blur-xl opacity-60"
+                  animate={{
+                    scale: [1, 1.2, 1],
+                    opacity: [0.6, 0.8, 0.6],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                
+                {/* Main sphere */}
+                <div className="relative w-20 h-20 rounded-full bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 shadow-2xl overflow-hidden">
+                  {/* Shine effect */}
+                  <div className="absolute inset-2 rounded-full bg-gradient-to-br from-white/30 to-transparent" />
+                  
+                  {/* Inner glow */}
+                  <div className="absolute inset-3 rounded-full bg-gradient-to-br from-white/10 to-transparent backdrop-blur-sm" />
+                  
+                  {/* Eyes */}
+                  <div className="absolute top-6 left-0 right-0 flex justify-center gap-2">
+                    <motion.div 
+                      className="w-2 h-2 rounded-full bg-white shadow-lg"
+                      animate={{
+                        scaleY: [1, 0.1, 1],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 2,
+                      }}
+                    />
+                    <motion.div 
+                      className="w-2 h-2 rounded-full bg-white shadow-lg"
+                      animate={{
+                        scaleY: [1, 0.1, 1],
+                      }}
+                      transition={{
+                        duration: 3,
+                        repeat: Infinity,
+                        repeatDelay: 2,
+                      }}
+                    />
+                  </div>
+                  
+                  {/* Smile */}
+                  <motion.div 
+                    className="absolute bottom-5 left-1/2 -translate-x-1/2 w-6 h-3 border-b-2 border-white rounded-full"
+                    animate={{
+                      scaleX: [1, 1.1, 1],
+                    }}
+                    transition={{
+                      duration: 2,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  
+                  {/* Sparkles */}
+                  <motion.div
+                    className="absolute top-2 right-2 w-1 h-1 bg-white rounded-full"
+                    animate={{
+                      scale: [0, 1, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      repeatDelay: 1,
+                    }}
+                  />
+                  <motion.div
+                    className="absolute bottom-3 left-2 w-1 h-1 bg-white rounded-full"
+                    animate={{
+                      scale: [0, 1, 0],
+                      opacity: [0, 1, 0],
+                    }}
+                    transition={{
+                      duration: 1.5,
+                      repeat: Infinity,
+                      repeatDelay: 0.5,
+                      delay: 0.5,
+                    }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+
+            <div className="relative flex items-center justify-between p-4 border-b border-border">
               <h3 className="font-semibold">AI Assistant</h3>
               <button
                 onClick={() => setIsOpen(false)}
