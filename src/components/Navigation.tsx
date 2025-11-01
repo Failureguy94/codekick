@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Home, User, Search, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export const Navigation = () => {
   const navigate = useNavigate();
@@ -41,6 +42,7 @@ export const Navigation = () => {
                 <Search className="w-4 h-4 mr-2" />
                 Discover
               </Button>
+              <ThemeToggle />
               <Button
                 variant="ghost"
                 size="sm"
