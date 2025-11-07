@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      blogs: {
+        Row: {
+          content: string
+          created_at: string
+          date: string
+          id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          date?: string
+          id?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          date?: string
+          id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       otp_verifications: {
         Row: {
           attempts: number | null
@@ -92,6 +119,36 @@ export type Database = {
           telegram?: string | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      research_papers: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          link: string
+          summary: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string
+          id?: string
+          link: string
+          summary: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          link?: string
+          summary?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

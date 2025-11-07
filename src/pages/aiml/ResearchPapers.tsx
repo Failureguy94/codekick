@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Edit, Save, X, Plus, Trash } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const ADMIN_PASSWORD = "Maddy-Folks";
 
@@ -17,38 +18,38 @@ const ResearchPapers = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [papers, setPapers] = useState<Paper[]>([
-    {
-      id: 1,
-      title: "Attention Is All You Need",
-      date: "2025-01-15",
-      summary: "Revolutionary paper introducing the Transformer architecture, the foundation of modern LLMs like GPT and BERT.",
-      link: "https://arxiv.org/abs/1706.03762",
-    },
-    {
-      id: 2,
-      title: "Deep Residual Learning for Image Recognition",
-      date: "2025-01-14",
-      summary: "ResNet architecture that solved the vanishing gradient problem with skip connections, enabling very deep networks.",
-      link: "https://arxiv.org/abs/1512.03385",
-    },
-    {
-      id: 3,
-      title: "BERT: Pre-training of Deep Bidirectional Transformers",
-      date: "2025-01-13",
-      summary: "Bidirectional transformer pre-training method that revolutionized NLP tasks and understanding of language models.",
-      link: "https://arxiv.org/abs/1810.04805",
-    },
-  ]);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<Paper | null>(null);
+  const [papers, setPapers] = useState<any[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState<any | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [newPaper, setNewPaper] = useState<Omit<Paper, "id">>({
+  const [newPaper, setNewPaper] = useState({
     title: "",
     date: new Date().toISOString().split("T")[0],
     summary: "",
     link: "",
   });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPapers();
+  }, []);
+
+  const fetchPapers = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("research_papers")
+        .select("*")
+        .order("date", { ascending: false });
+
+      if (error) throw error;
+      setPapers(data || []);
+    } catch (error) {
+      console.error("Error fetching papers:", error);
+      toast.error("Failed to load papers");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
@@ -61,39 +62,80 @@ const ResearchPapers = () => {
     setPasswordInput("");
   };
 
-  const startEdit = (paper: Paper) => {
+  const startEdit = (paper: any) => {
     setEditingId(paper.id);
     setEditForm({ ...paper });
   };
 
-  const saveEdit = () => {
+  const saveEdit = async () => {
     if (editForm) {
-      setPapers(papers.map((p) => (p.id === editingId ? editForm : p)));
-      setEditingId(null);
-      setEditForm(null);
-      toast.success("Paper updated successfully!");
+      try {
+        const { error } = await supabase
+          .from("research_papers")
+          .update({
+            title: editForm.title,
+            summary: editForm.summary,
+            link: editForm.link,
+          })
+          .eq("id", editingId);
+
+        if (error) throw error;
+
+        setPapers(papers.map((p) => (p.id === editingId ? editForm : p)));
+        setEditingId(null);
+        setEditForm(null);
+        toast.success("Paper updated successfully!");
+      } catch (error) {
+        console.error("Error updating paper:", error);
+        toast.error("Failed to update paper");
+      }
     }
   };
 
-  const addPaper = () => {
+  const addPaper = async () => {
     if (newPaper.title && newPaper.summary && newPaper.link) {
-      setPapers([...papers, { ...newPaper, id: Date.now() }]);
-      setNewPaper({
-        title: "",
-        date: new Date().toISOString().split("T")[0],
-        summary: "",
-        link: "",
-      });
-      setShowAddModal(false);
-      toast.success("Paper added successfully!");
+      try {
+        const { data, error } = await supabase
+          .from("research_papers")
+          .insert([newPaper])
+          .select()
+          .single();
+
+        if (error) throw error;
+
+        setPapers([data, ...papers]);
+        setNewPaper({
+          title: "",
+          date: new Date().toISOString().split("T")[0],
+          summary: "",
+          link: "",
+        });
+        setShowAddModal(false);
+        toast.success("Paper added successfully!");
+      } catch (error) {
+        console.error("Error adding paper:", error);
+        toast.error("Failed to add paper");
+      }
     } else {
       toast.error("Please fill all fields!");
     }
   };
 
-  const deletePaper = (id: number) => {
-    setPapers(papers.filter((p) => p.id !== id));
-    toast.success("Paper deleted!");
+  const deletePaper = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from("research_papers")
+        .delete()
+        .eq("id", id);
+
+      if (error) throw error;
+
+      setPapers(papers.filter((p) => p.id !== id));
+      toast.success("Paper deleted!");
+    } catch (error) {
+      console.error("Error deleting paper:", error);
+      toast.error("Failed to delete paper");
+    }
   };
 
   return (
@@ -133,8 +175,17 @@ const ResearchPapers = () => {
           </div>
         </motion.div>
 
-        <div className="space-y-6">
-          {papers.map((paper, index) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading papers...</p>
+          </div>
+        ) : papers.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No papers available yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {papers.map((paper, index) => (
             <motion.div
               key={paper.id}
               initial={{ opacity: 0, y: 20 }}
@@ -219,8 +270,9 @@ const ResearchPapers = () => {
                 </>
               )}
             </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Password Modal */}

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Lock, Edit, Save, X } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const ADMIN_PASSWORD = "Maddy-Folks";
 
@@ -9,29 +10,32 @@ const DailyBlogs = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [blogs, setBlogs] = useState([
-    {
-      id: 1,
-      title: "Getting Started with Codeforces",
-      date: "2025-01-15",
-      content: "Learn how to create and optimize your Codeforces account. Understand the rating system and choose the right contests to participate in.",
-    },
-    {
-      id: 2,
-      title: "LeetCode Contest Strategies",
-      date: "2025-01-14",
-      content: "Master the art of participating in LeetCode weekly contests. Time management tips and common mistakes to avoid.",
-    },
-    {
-      id: 3,
-      title: "Understanding CodeChef Long Challenge",
-      date: "2025-01-13",
-      content: "Deep dive into CodeChef's monthly Long Challenge. Learn when to use which data structures and how to approach editorial problems.",
-    },
-  ]);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchBlogs();
+  }, []);
+
+  const fetchBlogs = async () => {
+    try {
+      const { data, error } = await supabase
+        .from("blogs")
+        .select("*")
+        .order("date", { ascending: false });
+
+      if (error) throw error;
+      setBlogs(data || []);
+    } catch (error) {
+      console.error("Error fetching blogs:", error);
+      toast.error("Failed to load blogs");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handlePasswordSubmit = () => {
     if (passwordInput === ADMIN_PASSWORD) {
@@ -50,14 +54,26 @@ const DailyBlogs = () => {
     setEditContent(blog.content);
   };
 
-  const saveEdit = () => {
-    setBlogs(blogs.map(blog =>
-      blog.id === editingId
-        ? { ...blog, title: editTitle, content: editContent }
-        : blog
-    ));
-    setEditingId(null);
-    toast.success("Blog updated successfully!");
+  const saveEdit = async () => {
+    try {
+      const { error } = await supabase
+        .from("blogs")
+        .update({ title: editTitle, content: editContent })
+        .eq("id", editingId);
+
+      if (error) throw error;
+
+      setBlogs(blogs.map(blog =>
+        blog.id === editingId
+          ? { ...blog, title: editTitle, content: editContent }
+          : blog
+      ));
+      setEditingId(null);
+      toast.success("Blog updated successfully!");
+    } catch (error) {
+      console.error("Error updating blog:", error);
+      toast.error("Failed to update blog");
+    }
   };
 
   return (
@@ -86,8 +102,17 @@ const DailyBlogs = () => {
           )}
         </motion.div>
 
-        <div className="space-y-6">
-          {blogs.map((blog, index) => (
+        {loading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading blogs...</p>
+          </div>
+        ) : blogs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">No blogs available yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {blogs.map((blog, index) => (
             <motion.div
               key={blog.id}
               initial={{ opacity: 0, y: 20 }}
@@ -147,8 +172,9 @@ const DailyBlogs = () => {
                 </>
               )}
             </motion.div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Password Modal */}
