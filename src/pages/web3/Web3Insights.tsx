@@ -8,11 +8,11 @@ import remarkGfm from "remark-gfm";
 
 const ADMIN_PASSWORD = "Maddy-Folks";
 
-const DailyBlogs = () => {
+const Web3Insights = () => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [passwordInput, setPasswordInput] = useState("");
   const [showPasswordModal, setShowPasswordModal] = useState(false);
-  const [blogs, setBlogs] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState("");
   const [editTitle, setEditTitle] = useState("");
@@ -20,21 +20,21 @@ const DailyBlogs = () => {
   const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
-    fetchBlogs();
+    fetchInsights();
   }, []);
 
-  const fetchBlogs = async () => {
+  const fetchInsights = async () => {
     try {
       const { data, error } = await supabase
-        .from("blogs")
+        .from("web3_insights")
         .select("*")
         .order("date", { ascending: false });
 
       if (error) throw error;
-      setBlogs(data || []);
+      setInsights(data || []);
     } catch (error) {
-      console.error("Error fetching blogs:", error);
-      toast.error("Failed to load blogs");
+      console.error("Error fetching insights:", error);
+      toast.error("Failed to load insights");
     } finally {
       setLoading(false);
     }
@@ -51,32 +51,32 @@ const DailyBlogs = () => {
     setPasswordInput("");
   };
 
-  const startEdit = (blog: any) => {
-    setEditingId(blog.id);
-    setEditTitle(blog.title);
-    setEditContent(blog.content);
+  const startEdit = (insight: any) => {
+    setEditingId(insight.id);
+    setEditTitle(insight.title);
+    setEditContent(insight.content);
   };
 
   const saveEdit = async () => {
     try {
       const { error } = await supabase
-        .from("blogs")
+        .from("web3_insights")
         .update({ title: editTitle, content: editContent })
         .eq("id", editingId);
 
       if (error) throw error;
 
-      setBlogs(blogs.map(blog =>
-        blog.id === editingId
-          ? { ...blog, title: editTitle, content: editContent }
-          : blog
+      setInsights(insights.map(insight =>
+        insight.id === editingId
+          ? { ...insight, title: editTitle, content: editContent }
+          : insight
       ));
       setEditingId(null);
       setShowPreview(false);
-      toast.success("Blog updated successfully!");
+      toast.success("Insight updated successfully!");
     } catch (error) {
-      console.error("Error updating blog:", error);
-      toast.error("Failed to update blog");
+      console.error("Error updating insight:", error);
+      toast.error("Failed to update insight");
     }
   };
 
@@ -90,9 +90,9 @@ const DailyBlogs = () => {
         >
           <div>
             <h1 className="text-4xl md:text-5xl font-bold mb-2 bg-gradient-primary bg-clip-text text-transparent">
-              Daily CP Blogs
+              Web3 Insights & News
             </h1>
-            <p className="text-muted-foreground">Stay updated with the latest in competitive programming</p>
+            <p className="text-muted-foreground">Stay updated with the latest in blockchain and Web3</p>
           </div>
           
           {!isAdmin && (
@@ -108,23 +108,23 @@ const DailyBlogs = () => {
 
         {loading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Loading blogs...</p>
+            <p className="text-muted-foreground">Loading insights...</p>
           </div>
-        ) : blogs.length === 0 ? (
+        ) : insights.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">No blogs available yet.</p>
+            <p className="text-muted-foreground">No insights available yet.</p>
           </div>
         ) : (
           <div className="space-y-6">
-            {blogs.map((blog, index) => (
-            <motion.div
-              key={blog.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="bg-card rounded-2xl p-6 shadow-elegant border border-border"
-            >
-                {editingId === blog.id ? (
+            {insights.map((insight, index) => (
+              <motion.div
+                key={insight.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                className="bg-card rounded-2xl p-6 shadow-elegant border border-border"
+              >
+                {editingId === insight.id ? (
                   <div className="space-y-4">
                     <input
                       type="text"
@@ -178,12 +178,12 @@ const DailyBlogs = () => {
                   <>
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h2 className="text-2xl font-bold text-foreground">{blog.title}</h2>
-                        <p className="text-sm text-muted-foreground mt-1">{blog.date}</p>
+                        <h2 className="text-2xl font-bold text-foreground">{insight.title}</h2>
+                        <p className="text-sm text-muted-foreground mt-1">{insight.date}</p>
                       </div>
                       {isAdmin && (
                         <button
-                          onClick={() => startEdit(blog)}
+                          onClick={() => startEdit(insight)}
                           className="flex items-center gap-2 px-3 py-1 bg-primary/10 text-primary rounded-lg hover:bg-primary/20 transition-colors"
                         >
                           <Edit className="w-4 h-4" />
@@ -192,11 +192,11 @@ const DailyBlogs = () => {
                       )}
                     </div>
                     <div className="prose prose-sm max-w-none text-muted-foreground dark:prose-invert">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{blog.content}</ReactMarkdown>
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{insight.content}</ReactMarkdown>
                     </div>
                   </>
                 )}
-            </motion.div>
+              </motion.div>
             ))}
           </div>
         )}
@@ -241,4 +241,4 @@ const DailyBlogs = () => {
   );
 };
 
-export default DailyBlogs;
+export default Web3Insights;

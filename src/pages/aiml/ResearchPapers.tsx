@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Lock, Edit, Save, X, Plus, Trash } from "lucide-react";
+import { Lock, Edit, Save, X, Plus, Trash, Eye } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 const ADMIN_PASSWORD = "Maddy-Folks";
 
@@ -29,6 +31,7 @@ const ResearchPapers = () => {
     link: "",
   });
   const [loading, setLoading] = useState(true);
+  const [showPreview, setShowPreview] = useState(false);
 
   useEffect(() => {
     fetchPapers();
@@ -84,6 +87,7 @@ const ResearchPapers = () => {
         setPapers(papers.map((p) => (p.id === editingId ? editForm : p)));
         setEditingId(null);
         setEditForm(null);
+        setShowPreview(false);
         toast.success("Paper updated successfully!");
       } catch (error) {
         console.error("Error updating paper:", error);
@@ -208,12 +212,28 @@ const ResearchPapers = () => {
                     placeholder="Paper URL"
                     className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary"
                   />
-                  <textarea
-                    value={editForm.summary}
-                    onChange={(e) => setEditForm({ ...editForm, summary: e.target.value })}
-                    rows={4}
-                    className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
-                  />
+                  <div className="flex gap-2 mb-2">
+                    <button
+                      onClick={() => setShowPreview(!showPreview)}
+                      className="flex items-center gap-2 px-3 py-1 bg-secondary text-foreground rounded-lg hover:bg-secondary/80 transition-colors"
+                    >
+                      <Eye className="w-4 h-4" />
+                      {showPreview ? "Edit" : "Preview"}
+                    </button>
+                  </div>
+                  {showPreview ? (
+                    <div className="w-full px-4 py-2 rounded-lg border border-border bg-background min-h-[100px] prose prose-sm max-w-none dark:prose-invert">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>{editForm.summary}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <textarea
+                      value={editForm.summary}
+                      onChange={(e) => setEditForm({ ...editForm, summary: e.target.value })}
+                      rows={4}
+                      placeholder="Use Markdown for formatting: **bold**, *italic*, [links](url), etc."
+                      className="w-full px-4 py-2 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none font-mono text-sm"
+                    />
+                  )}
                   <div className="flex gap-2">
                     <button
                       onClick={saveEdit}
@@ -226,6 +246,7 @@ const ResearchPapers = () => {
                       onClick={() => {
                         setEditingId(null);
                         setEditForm(null);
+                        setShowPreview(false);
                       }}
                       className="flex items-center gap-2 px-4 py-2 bg-destructive text-white rounded-lg hover:opacity-90 transition-opacity"
                     >
@@ -258,7 +279,9 @@ const ResearchPapers = () => {
                       </div>
                     )}
                   </div>
-                  <p className="text-muted-foreground leading-relaxed mb-4">{paper.summary}</p>
+                  <div className="prose prose-sm max-w-none text-muted-foreground dark:prose-invert mb-4">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{paper.summary}</ReactMarkdown>
+                  </div>
                   <a
                     href={paper.link}
                     target="_blank"

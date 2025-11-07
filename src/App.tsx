@@ -21,6 +21,7 @@ import AimlOverview from "./pages/aiml/Overview";
 import AimlStepPage from "./pages/aiml/StepPage";
 import ResearchPapers from "./pages/aiml/ResearchPapers";
 import Web3Track from "./pages/web3/Web3Track";
+import Web3Insights from "./pages/web3/Web3Insights";
 import Web2Track from "./pages/web2/Web2Track";
 import NotFound from "./pages/NotFound";
 
@@ -53,8 +54,9 @@ const App = () => (
           <Route path="/aiml/step-:step" element={<ProtectedRoute><AimlStepPage /></ProtectedRoute>} />
           <Route path="/aiml/papers" element={<ProtectedRoute><ResearchPapers /></ProtectedRoute>} />
           
-          {/* Web3 Route */}
+          {/* Web3 Routes */}
           <Route path="/web3" element={<ProtectedRoute><Web3Track /></ProtectedRoute>} />
+          <Route path="/web3/insights" element={<ProtectedRoute><Web3Insights /></ProtectedRoute>} />
           
           {/* Web2 Route */}
           <Route path="/web2" element={<ProtectedRoute><Web2Track /></ProtectedRoute>} />

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 import { ExternalLink, CheckCircle, ArrowRight } from "lucide-react";
 
 const web3Resources = [
@@ -27,6 +28,7 @@ const web3Resources = [
 ];
 
 const Web3Track = () => {
+  const navigate = useNavigate();
   const [completedSteps, setCompletedSteps] = useState<number[]>(
     JSON.parse(localStorage.getItem("web3CompletedSteps") || "[]")
   );
@@ -159,6 +161,20 @@ const Web3Track = () => {
                 <span>Deploy contracts on Ethereum and other blockchains</span>
               </li>
             </ul>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 text-center"
+          >
+            <button
+              onClick={() => navigate("/web3/insights")}
+              className="px-8 py-4 bg-accent text-white rounded-xl font-semibold shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105"
+            >
+              View Web3 Insights & News
+            </button>
           </motion.div>
         </motion.div>
       </div>
