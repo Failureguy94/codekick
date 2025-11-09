@@ -81,19 +81,10 @@ export default function VerifyPhone() {
 
       if (error) throw error;
 
-      // In development mode, show the OTP code
-      if (data?.dev_mode && data?.otp) {
-        toast({
-          title: 'OTP Sent (Dev Mode)',
-          description: `Your verification code is: ${data.otp}`,
-          duration: 10000,
-        });
-      } else {
-        toast({
-          title: 'OTP Sent',
-          description: 'Verification code sent to your phone',
-        });
-      }
+      toast({
+        title: 'OTP Sent',
+        description: 'Verification code sent to your phone',
+      });
 
       setStep('otp');
       setResendTimer(60);

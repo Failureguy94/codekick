@@ -56,25 +56,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Failed to generate OTP');
     }
 
-    // Development mode: Log OTP instead of sending SMS
-    const isDevelopment = Deno.env.get('ENVIRONMENT') !== 'production';
-    
-    if (isDevelopment) {
-      console.log(`[DEV MODE] OTP for ${fullPhoneNumber}: ${otpCode}`);
-      console.log(`[DEV MODE] Use this code to verify: ${otpCode}`);
-      
-      return new Response(
-        JSON.stringify({ 
-          success: true, 
-          message: 'OTP sent successfully',
-          dev_mode: true,
-          otp: otpCode // Only in dev mode
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
-      );
-    }
-
-    // Production mode: Send SMS via Twilio
+    // Send SMS via Twilio
     const twilioAccountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
     const twilioAuthToken = Deno.env.get('TWILIO_AUTH_TOKEN');
     const twilioPhoneNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
@@ -105,7 +87,7 @@ const handler = async (req: Request): Promise<Response> => {
       throw new Error('Failed to send SMS');
     }
 
-    console.log(`OTP sent successfully for user ${user.id}`);
+    console.log(`OTP sent successfully to ${fullPhoneNumber}`);
 
     return new Response(
       JSON.stringify({ success: true, message: 'OTP sent successfully' }),
