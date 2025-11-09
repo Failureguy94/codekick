@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
 import { ExternalLink, ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
 import { beginnerResources, intermediateResources, advancedResources } from "@/data/cpResources";
+import { Navigation } from "@/components/Navigation";
 
 const Resources = () => {
   const { language, level } = useParams();
@@ -31,8 +32,10 @@ const Resources = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
-      <div className="max-w-5xl mx-auto">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
+        <div className="max-w-5xl mx-auto">
         <button
           onClick={() => navigate(-1)}
           className="mb-6 flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -145,8 +148,9 @@ const Resources = () => {
             </button>
           </motion.div>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

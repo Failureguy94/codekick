@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ExternalLink, CheckCircle, ArrowRight } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 const web3Resources = [
   {
@@ -40,8 +41,10 @@ const Web3Track = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
-      <div className="max-w-5xl mx-auto">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
+        <div className="max-w-5xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -177,8 +180,9 @@ const Web3Track = () => {
             </button>
           </motion.div>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

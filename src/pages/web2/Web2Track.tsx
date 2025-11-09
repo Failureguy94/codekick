@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Code2, Palette, Database, Rocket } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 const web2Skills = [
   {
@@ -30,8 +31,10 @@ const web2Skills = [
 
 const Web2Track = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
+        <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -173,8 +176,9 @@ const Web2Track = () => {
             </div>
           </motion.div>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

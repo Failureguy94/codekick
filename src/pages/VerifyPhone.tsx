@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { Navigation } from '@/components/Navigation';
 
 const countryCodes = [
   { code: '+1', country: 'US/Canada' },
@@ -138,7 +139,9 @@ export default function VerifyPhone() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center p-4">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-primary/10 via-background to-accent/10 flex items-center justify-center p-4 pt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -278,6 +281,7 @@ export default function VerifyPhone() {
           )}
         </div>
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

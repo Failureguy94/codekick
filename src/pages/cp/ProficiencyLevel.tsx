@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useNavigate, useParams } from "react-router-dom";
 import { GraduationCap, TrendingUp, Zap } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 const levels = [
   {
@@ -35,7 +36,9 @@ const ProficiencyLevel = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -80,7 +83,8 @@ const ProficiencyLevel = () => {
           })}
         </div>
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 };
 

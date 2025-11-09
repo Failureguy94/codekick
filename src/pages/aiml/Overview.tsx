@@ -2,14 +2,17 @@ import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
 import { aimlSteps } from "@/data/aimlResources";
+import { Navigation } from "@/components/Navigation";
 
 const Overview = () => {
   const navigate = useNavigate();
   const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
-      <div className="max-w-6xl mx-auto">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
+        <div className="max-w-6xl mx-auto">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -104,8 +107,9 @@ const Overview = () => {
             </button>
           </motion.div>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

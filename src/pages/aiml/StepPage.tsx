@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ExternalLink, CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
 import { aimlSteps } from "@/data/aimlResources";
 import { toast } from "sonner";
+import { Navigation } from "@/components/Navigation";
 
 const StepPage = () => {
   const { step } = useParams();
@@ -30,8 +31,10 @@ const StepPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
-      <div className="max-w-5xl mx-auto">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
+        <div className="max-w-5xl mx-auto">
         <button
           onClick={() => stepNumber === 1 ? navigate("/aiml") : navigate(`/aiml/step-${stepNumber - 1}`)}
           className="mb-6 flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
@@ -125,8 +128,9 @@ const StepPage = () => {
             </motion.div>
           </div>
         </motion.div>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

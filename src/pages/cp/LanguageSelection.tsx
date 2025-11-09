@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { Navigation } from "@/components/Navigation";
 
 const languages = [
   {
@@ -113,7 +114,9 @@ const LanguageSelection = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -151,7 +154,8 @@ const LanguageSelection = () => {
           backface-visibility: hidden;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 

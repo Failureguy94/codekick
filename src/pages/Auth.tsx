@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Chrome } from 'lucide-react';
+import { Navigation } from '@/components/Navigation';
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -86,7 +87,9 @@ const Auth = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4">
+    <>
+      <Navigation />
+      <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 flex items-center justify-center p-4 pt-20">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -241,7 +244,8 @@ const Auth = () => {
           </Tabs>
         </div>
       </motion.div>
-    </div>
+      </div>
+    </>
   );
 };
 
