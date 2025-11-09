@@ -38,8 +38,20 @@ const Auth = () => {
       if (error) throw error;
 
       if (data.user) {
-        toast.success('Account created! You can now sign in.');
-        navigate('/');
+        // Check if phone is verified
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('phone_verified')
+          .eq('id', data.user.id)
+          .single();
+
+        toast.success('Account created successfully!');
+        
+        if (!profile?.phone_verified) {
+          navigate('/verify-phone');
+        } else {
+          navigate('/');
+        }
       }
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign up');
@@ -53,15 +65,29 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (error) throw error;
 
-      toast.success('Signed in successfully!');
-      navigate('/');
+      // Check if phone is verified
+      if (data.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('phone_verified')
+          .eq('id', data.user.id)
+          .single();
+
+        toast.success('Signed in successfully!');
+        
+        if (!profile?.phone_verified) {
+          navigate('/verify-phone');
+        } else {
+          navigate('/');
+        }
+      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign in');
     } finally {
