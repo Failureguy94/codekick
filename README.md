@@ -10,7 +10,7 @@
 
 **Helping college freshers navigate their tech journey with personalized learning paths**
 
-[Live Demo](https://lovable.dev/projects/54c3655a-5c55-4b5f-9a8d-ee513fcca631) • [Report Bug](https://github.com/Failureguy94/codekick/issues) • [Request Feature](https://github.com/Failureguy94/codekick/issues)
+[Live Demo](https://lovable.dev/projects/54c3655a-5c55-4b5f-9a8d-ee513fcca631) • [Report Bug](https://github.com/Failureguy94/codekick/issues) 
 
 </div>
 
