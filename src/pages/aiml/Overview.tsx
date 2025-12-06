@@ -1,12 +1,59 @@
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ArrowRight, CheckCircle2, Circle } from "lucide-react";
+import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { aimlSteps } from "@/data/aimlResources";
 import { Navigation } from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from "react";
 
 const Overview = () => {
   const navigate = useNavigate();
-  const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
+  const { user } = useAuth();
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("user_progress")
+          .select("topic")
+          .eq("user_id", user.id)
+          .eq("domain", "aiml")
+          .eq("completed", true);
+
+        if (error) throw error;
+
+        const steps = data
+          ?.map((p) => parseInt(p.topic.replace("step-", "")))
+          .filter((n) => !isNaN(n)) || [];
+        setCompletedSteps(steps);
+      } catch (error) {
+        console.error("Failed to fetch progress:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgress();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>

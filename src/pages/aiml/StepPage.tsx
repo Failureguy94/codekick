@@ -1,28 +1,54 @@
 import { motion } from "framer-motion";
 import { useParams, useNavigate } from "react-router-dom";
-import { ExternalLink, CheckCircle, ArrowLeft, ArrowRight } from "lucide-react";
+import { ExternalLink, CheckCircle, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { aimlSteps } from "@/data/aimlResources";
 import { toast } from "sonner";
 import { Navigation } from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useState } from "react";
 
 const StepPage = () => {
   const { step } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [saving, setSaving] = useState(false);
   const currentStep = aimlSteps[parseInt(step || "0") - 1];
   const stepNumber = parseInt(step || "0");
 
-  const handleComplete = () => {
-    const completedSteps = JSON.parse(localStorage.getItem("completedSteps") || "[]");
-    if (!completedSteps.includes(stepNumber)) {
-      completedSteps.push(stepNumber);
-      localStorage.setItem("completedSteps", JSON.stringify(completedSteps));
-      toast.success("Step marked as complete!");
+  const handleComplete = async () => {
+    if (!user) {
+      toast.error("Please sign in to save progress");
+      return;
     }
 
-    if (stepNumber < 5) {
-      navigate(`/aiml/step/${stepNumber + 1}`);
-    } else {
-      navigate("/aiml/papers");
+    setSaving(true);
+    try {
+      const { error } = await supabase
+        .from("user_progress")
+        .upsert({
+          user_id: user.id,
+          domain: "aiml",
+          topic: `step-${stepNumber}`,
+          completed: true,
+          completed_at: new Date().toISOString(),
+        }, {
+          onConflict: "user_id,domain,topic"
+        });
+
+      if (error) throw error;
+
+      toast.success("Step marked as complete!");
+
+      if (stepNumber < 5) {
+        navigate(`/aiml/step/${stepNumber + 1}`);
+      } else {
+        navigate("/aiml/papers");
+      }
+    } catch (error: any) {
+      toast.error("Failed to save progress: " + error.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -113,9 +139,14 @@ const StepPage = () => {
             >
               <button
                 onClick={handleComplete}
-                className="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                disabled={saving}
+                className="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {stepNumber < 5 ? (
+                {saving ? (
+                  <>
+                    Saving... <Loader2 className="w-5 h-5 animate-spin" />
+                  </>
+                ) : stepNumber < 5 ? (
                   <>
                     Complete & Continue <ArrowRight className="w-5 h-5" />
                   </>
