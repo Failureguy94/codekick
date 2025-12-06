@@ -1,12 +1,42 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, User, Search, LogOut } from 'lucide-react';
+import { Home, User, Search, LogOut, Phone, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { Badge } from '@/components/ui/badge';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 export const Navigation = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
+  const [phoneVerified, setPhoneVerified] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    if (user) {
+      loadPhoneStatus();
+    }
+  }, [user]);
+
+  const loadPhoneStatus = async () => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('phone_verified')
+        .eq('id', user?.id)
+        .maybeSingle();
+      
+      setPhoneVerified(data?.phone_verified ?? false);
+    } catch (error) {
+      console.error('Error loading phone status:', error);
+    }
+  };
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
@@ -43,6 +73,32 @@ export const Navigation = () => {
                 Discover
               </Button>
               <ThemeToggle />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => navigate('/verify-phone')}
+                      className="relative"
+                    >
+                      <Phone className="w-4 h-4" />
+                      {phoneVerified !== null && (
+                        <span className="absolute -top-1 -right-1">
+                          {phoneVerified ? (
+                            <CheckCircle className="w-3 h-3 text-green-500" />
+                          ) : (
+                            <AlertCircle className="w-3 h-3 text-yellow-500" />
+                          )}
+                        </span>
+                      )}
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    {phoneVerified ? 'Phone verified' : 'Verify phone number'}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
               <Button
                 variant="ghost"
                 size="sm"
