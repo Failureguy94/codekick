@@ -75,7 +75,7 @@ const Overview = () => {
                       </div>
 
                       <button
-                        onClick={() => navigate(`/aiml/step-${step.step}`)}
+                        onClick={() => navigate(`/aiml/step/${step.step}`)}
                         disabled={index > 0 && !completedSteps.includes(index)}
                         className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
                           index > 0 && !completedSteps.includes(index)

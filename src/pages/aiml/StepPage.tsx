@@ -20,7 +20,7 @@ const StepPage = () => {
     }
 
     if (stepNumber < 5) {
-      navigate(`/aiml/step-${stepNumber + 1}`);
+      navigate(`/aiml/step/${stepNumber + 1}`);
     } else {
       navigate("/aiml/papers");
     }
@@ -36,7 +36,7 @@ const StepPage = () => {
       <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20">
         <div className="max-w-5xl mx-auto">
         <button
-          onClick={() => stepNumber === 1 ? navigate("/aiml") : navigate(`/aiml/step-${stepNumber - 1}`)}
+          onClick={() => stepNumber === 1 ? navigate("/aiml") : navigate(`/aiml/step/${stepNumber - 1}`)}
           className="mb-6 flex items-center gap-2 text-primary hover:text-primary/80 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
