@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Save } from "lucide-react";
+import { Save, Phone, CheckCircle, AlertCircle, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -23,6 +24,9 @@ const Profile = () => {
     coding_platform: "",
     telegram: "",
     linkedin: "",
+    phone_number: "",
+    country_code: "+1",
+    phone_verified: false,
   });
 
   useEffect(() => {
@@ -48,6 +52,9 @@ const Profile = () => {
           coding_platform: data.coding_platform || "",
           telegram: data.telegram || "",
           linkedin: data.linkedin || "",
+          phone_number: data.phone_number || "",
+          country_code: data.country_code || "+1",
+          phone_verified: data.phone_verified || false,
         });
       }
     } catch (error) {
@@ -60,13 +67,49 @@ const Profile = () => {
     try {
       const { error } = await supabase
         .from('profiles')
-        .update(profileData)
+        .update({
+          username: profileData.username,
+          full_name: profileData.full_name,
+          bio: profileData.bio,
+          coding_platform: profileData.coding_platform,
+          telegram: profileData.telegram,
+          linkedin: profileData.linkedin,
+        })
         .eq('id', user?.id);
 
       if (error) throw error;
       toast.success("Profile updated successfully!");
     } catch (error: any) {
       toast.error(error.message || "Failed to update profile");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUpdatePhone = async () => {
+    if (!profileData.phone_number) {
+      toast.error("Please enter a phone number");
+      return;
+    }
+    
+    setLoading(true);
+    try {
+      // Reset phone_verified to false when updating phone number
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          phone_number: profileData.phone_number,
+          country_code: profileData.country_code,
+          phone_verified: false,
+        })
+        .eq('id', user?.id);
+
+      if (error) throw error;
+      
+      toast.success("Phone number updated! Please verify it.");
+      navigate('/verify-phone');
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update phone number");
     } finally {
       setLoading(false);
     }
@@ -170,6 +213,80 @@ const Profile = () => {
                 Go to Domains
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Phone Verification Card */}
+        <Card className="shadow-elegant w-full max-w-lg mt-6">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <Phone className="w-5 h-5" />
+                  Phone Verification
+                </CardTitle>
+                <CardDescription>
+                  Verify your phone number for enhanced security
+                </CardDescription>
+              </div>
+              <Badge variant={profileData.phone_verified ? "default" : "secondary"} className="flex items-center gap-1">
+                {profileData.phone_verified ? (
+                  <>
+                    <CheckCircle className="w-3 h-3" />
+                    Verified
+                  </>
+                ) : (
+                  <>
+                    <AlertCircle className="w-3 h-3" />
+                    Not Verified
+                  </>
+                )}
+              </Badge>
+            </div>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-2">
+              <div className="w-24">
+                <Label htmlFor="country_code">Code</Label>
+                <Input
+                  id="country_code"
+                  value={profileData.country_code}
+                  onChange={(e) => setProfileData({ ...profileData, country_code: e.target.value })}
+                  placeholder="+1"
+                />
+              </div>
+              <div className="flex-1">
+                <Label htmlFor="phone_number">Phone Number</Label>
+                <Input
+                  id="phone_number"
+                  value={profileData.phone_number}
+                  onChange={(e) => setProfileData({ ...profileData, phone_number: e.target.value })}
+                  placeholder="1234567890"
+                />
+              </div>
+            </div>
+
+            {profileData.phone_verified ? (
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={handleUpdatePhone}
+                  disabled={loading}
+                  className="flex-1"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Update & Re-verify
+                </Button>
+              </div>
+            ) : (
+              <Button
+                onClick={() => navigate('/verify-phone')}
+                className="w-full"
+              >
+                <Phone className="w-4 h-4 mr-2" />
+                {profileData.phone_number ? 'Verify Phone Number' : 'Add & Verify Phone'}
+              </Button>
+            )}
           </CardContent>
         </Card>
       </div>
