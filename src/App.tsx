@@ -51,7 +51,7 @@ const App = () => (
           
           {/* AI/ML Routes */}
           <Route path="/aiml" element={<ProtectedRoute><AimlOverview /></ProtectedRoute>} />
-          <Route path="/aiml/step-:step" element={<ProtectedRoute><AimlStepPage /></ProtectedRoute>} />
+          <Route path="/aiml/step/:step" element={<ProtectedRoute><AimlStepPage /></ProtectedRoute>} />
           <Route path="/aiml/papers" element={<ProtectedRoute><ResearchPapers /></ProtectedRoute>} />
           
           {/* Web3 Routes */}
