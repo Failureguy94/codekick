@@ -1,8 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { ExternalLink, CheckCircle, ArrowRight } from "lucide-react";
+import { ExternalLink, CheckCircle, Loader2 } from "lucide-react";
 import { Navigation } from "@/components/Navigation";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "sonner";
 
 const web3Resources = [
   {
@@ -10,35 +13,100 @@ const web3Resources = [
     title: "React Fundamentals",
     description: "Master React before diving into Web3 development",
     url: "https://youtu.be/LuNPCSNr-nE",
-    completed: false,
   },
   {
     step: 2,
     title: "Web3 Development Introduction",
     description: "Learn blockchain basics and Web3 concepts",
     url: "https://youtu.be/6aF6p2VUORE?si=jxUVT7Xd-2ZRmZqB",
-    completed: false,
   },
   {
     step: 3,
     title: "Advanced Web3 Development",
     description: "Deep dive into smart contracts and dApps",
     url: "https://youtube.com/playlist?list=PLO5VPQH6OWdVQwpQfw9rZ67O6Pjfo6q-p&si=PFfrtJLrx_EeIoCG",
-    completed: false,
   },
 ];
 
 const Web3Track = () => {
   const navigate = useNavigate();
-  const [completedSteps, setCompletedSteps] = useState<number[]>(
-    JSON.parse(localStorage.getItem("web3CompletedSteps") || "[]")
-  );
+  const { user } = useAuth();
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<number | null>(null);
 
-  const handleComplete = (step: number) => {
-    const updated = [...completedSteps, step];
-    setCompletedSteps(updated);
-    localStorage.setItem("web3CompletedSteps", JSON.stringify(updated));
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data, error } = await supabase
+          .from("user_progress")
+          .select("topic")
+          .eq("user_id", user.id)
+          .eq("domain", "web3")
+          .eq("completed", true);
+
+        if (error) throw error;
+
+        const steps = data
+          ?.map((p) => parseInt(p.topic.replace("step-", "")))
+          .filter((n) => !isNaN(n)) || [];
+        setCompletedSteps(steps);
+      } catch (error) {
+        console.error("Failed to fetch progress:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProgress();
+  }, [user]);
+
+  const handleComplete = async (step: number) => {
+    if (!user) {
+      toast.error("Please sign in to save progress");
+      return;
+    }
+
+    setSaving(step);
+    try {
+      const { error } = await supabase
+        .from("user_progress")
+        .upsert({
+          user_id: user.id,
+          domain: "web3",
+          topic: `step-${step}`,
+          completed: true,
+          completed_at: new Date().toISOString(),
+        }, {
+          onConflict: "user_id,domain,topic"
+        });
+
+      if (error) throw error;
+
+      setCompletedSteps((prev) => [...prev, step]);
+      toast.success("Step marked as complete!");
+    } catch (error: any) {
+      toast.error("Failed to save progress: " + error.message);
+    } finally {
+      setSaving(null);
+    }
   };
+
+  if (loading) {
+    return (
+      <>
+        <Navigation />
+        <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4 pt-20 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -104,15 +172,19 @@ const Web3Track = () => {
                         {!completedSteps.includes(resource.step) && (
                           <button
                             onClick={() => handleComplete(resource.step)}
-                            disabled={index > 0 && !completedSteps.includes(index)}
+                            disabled={(index > 0 && !completedSteps.includes(index)) || saving === resource.step}
                             className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-all duration-300 ${
                               index > 0 && !completedSteps.includes(index)
                                 ? "bg-muted text-muted-foreground cursor-not-allowed"
                                 : "bg-success text-white hover:opacity-90"
                             }`}
                           >
-                            <CheckCircle className="w-4 h-4" />
-                            Mark as Complete
+                            {saving === resource.step ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <CheckCircle className="w-4 h-4" />
+                            )}
+                            {saving === resource.step ? "Saving..." : "Mark as Complete"}
                           </button>
                         )}
 
