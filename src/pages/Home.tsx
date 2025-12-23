@@ -7,7 +7,7 @@ import { Navigation } from "@/components/Navigation";
 const FloatingIcon = ({ icon: Icon, delay, x, y }: any) => (
   <motion.div
     initial={{ opacity: 0, scale: 0 }}
-    animate={{ opacity: 0.15, scale: 1 }}
+    animate={{ opacity: 0.2, scale: 1 }}
     transition={{ delay, duration: 0.8 }}
     className="absolute"
     style={{ left: `${x}%`, top: `${y}%` }}
@@ -22,8 +22,11 @@ const FloatingIcon = ({ icon: Icon, delay, x, y }: any) => (
         repeat: Infinity,
         ease: "easeInOut",
       }}
+      className="relative"
     >
-      <Icon className="w-12 h-12 md:w-16 md:h-16 text-primary" strokeWidth={1.5} />
+      <Icon className="w-12 h-12 md:w-16 md:h-16 text-primary dark:text-accent" strokeWidth={1.5} />
+      {/* Glow effect behind icon */}
+      <div className="absolute inset-0 blur-xl bg-primary/20 dark:bg-accent/20 -z-10" />
     </motion.div>
   </motion.div>
 );
@@ -42,11 +45,15 @@ const Home = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 relative overflow-hidden">
+    <div className="min-h-screen bg-background relative overflow-hidden">
       <Navigation />
       
-      {/* Animated Background Pattern */}
-      <div className="absolute inset-0 bg-gradient-hero opacity-50" />
+      {/* Mesh gradient background */}
+      <div className="absolute inset-0 bg-mesh" />
+      
+      {/* Animated gradient orbs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
       
       {/* Floating Icons */}
       {floatingIcons.map((item, index) => (
@@ -62,7 +69,7 @@ const Home = () => {
           className="text-center max-w-4xl mx-auto"
         >
           <motion.h1
-            className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-primary bg-clip-text text-transparent"
+            className="text-5xl md:text-7xl font-bold mb-6 text-gradient"
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -81,7 +88,7 @@ const Home = () => {
 
           <motion.button
             onClick={() => navigate(user ? "/domains" : "/auth")}
-            className="px-8 py-4 bg-gradient-primary text-white rounded-xl font-semibold text-lg shadow-elegant hover:shadow-glow transition-all duration-300 hover:scale-105"
+            className="px-8 py-4 bg-gradient-primary text-primary-foreground rounded-xl font-semibold text-lg glow-effect hover:scale-105 transition-all duration-300"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}

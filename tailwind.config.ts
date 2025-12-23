@@ -55,13 +55,18 @@ export default {
       },
       backgroundImage: {
         'gradient-primary': 'var(--gradient-primary)',
+        'gradient-accent': 'var(--gradient-accent)',
         'gradient-card': 'var(--gradient-card)',
         'gradient-hero': 'var(--gradient-hero)',
+        'gradient-border': 'var(--gradient-border)',
       },
       boxShadow: {
         'elegant': 'var(--shadow-elegant)',
         'card-hover': 'var(--shadow-card)',
         'glow': 'var(--shadow-glow)',
+        'glow-sm': '0 0 20px hsl(var(--primary) / 0.3)',
+        'glow-lg': '0 0 60px hsl(var(--primary) / 0.4)',
+        'accent-glow': '0 0 30px hsl(var(--accent) / 0.4)',
       },
       transitionTimingFunction: {
         'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
@@ -102,7 +107,23 @@ export default {
         },
         "glow-pulse": {
           "0%, 100%": { boxShadow: "0 0 20px hsl(var(--primary) / 0.2)" },
-          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.4)" },
+          "50%": { boxShadow: "0 0 40px hsl(var(--primary) / 0.4), 0 0 60px hsl(var(--accent) / 0.2)" },
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "pulse-glow": {
+          "0%, 100%": { 
+            boxShadow: "0 0 20px hsl(var(--primary) / 0.3), 0 0 40px hsl(var(--accent) / 0.1)" 
+          },
+          "50%": { 
+            boxShadow: "0 0 40px hsl(var(--primary) / 0.5), 0 0 80px hsl(var(--accent) / 0.2)" 
+          },
         },
       },
       animation: {
@@ -114,6 +135,9 @@ export default {
         "scale-in": "scale-in 0.4s ease-out",
         "slide-up": "slide-up 0.8s ease-out",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
+        "shimmer": "shimmer 1.5s linear infinite",
+        "gradient-shift": "gradient-shift 4s ease infinite",
+        "pulse-glow": "pulse-glow 3s ease-in-out infinite",
       },
     },
   },

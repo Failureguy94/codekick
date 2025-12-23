@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { Code, Brain, Blocks, Globe2 } from "lucide-react";
+import { Navigation } from "@/components/Navigation";
 
 interface Domain {
   id: string;
@@ -118,16 +119,16 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
       >
         {/* Front */}
         <div className="absolute w-full h-full backface-hidden">
-          <div className={`h-full rounded-2xl bg-gradient-to-br ${domain.color} p-8 flex flex-col items-center justify-center text-white shadow-elegant`}>
+          <div className={`h-full rounded-2xl bg-gradient-to-br ${domain.color} p-8 flex flex-col items-center justify-center text-primary-foreground shadow-elegant`}>
             <Icon className="w-20 h-20 mb-6" strokeWidth={1.5} />
             <h3 className="text-3xl font-bold mb-4">{domain.name}</h3>
-            <p className="text-center text-white/90">{domain.description}</p>
+            <p className="text-center text-primary-foreground/90">{domain.description}</p>
           </div>
         </div>
 
         {/* Back */}
         <div className="absolute w-full h-full backface-hidden" style={{ transform: "rotateY(180deg)" }}>
-          <div className="h-full rounded-2xl bg-card border-2 border-primary/20 p-6 overflow-y-auto shadow-elegant">
+          <div className="h-full rounded-2xl glass-card border border-primary/20 p-6 overflow-y-auto">
             <h4 className="text-xl font-bold text-foreground mb-4">{domain.name} Overview</h4>
             
             <div className="space-y-4">
@@ -161,7 +162,7 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
             </div>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-primary font-medium">Click to explore →</p>
+              <p className="text-sm text-accent font-medium">Click to explore →</p>
             </div>
           </div>
         </div>
@@ -172,13 +173,19 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
 
 const Domains = () => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-primary/5 to-accent/5 py-12 px-4">
+    <div className="min-h-screen bg-background bg-mesh py-12 px-4">
+      <Navigation />
+      
+      {/* Ambient effects */}
+      <div className="fixed top-1/4 right-0 w-96 h-96 bg-primary/8 rounded-full blur-3xl pointer-events-none" />
+      <div className="fixed bottom-0 left-1/4 w-80 h-80 bg-accent/8 rounded-full blur-3xl pointer-events-none" />
+      
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="max-w-7xl mx-auto"
+        className="max-w-7xl mx-auto pt-20 relative z-10"
       >
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 bg-gradient-primary bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold text-center mb-4 text-gradient">
           Choose Your Domain
         </h1>
         <p className="text-center text-muted-foreground mb-12 text-lg">
@@ -198,18 +205,6 @@ const Domains = () => {
           ))}
         </div>
       </motion.div>
-
-      <style>{`
-        .perspective-1000 {
-          perspective: 1000px;
-        }
-        .preserve-3d {
-          transform-style: preserve-3d;
-        }
-        .backface-hidden {
-          backface-visibility: hidden;
-        }
-      `}</style>
     </div>
   );
 };
