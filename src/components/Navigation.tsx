@@ -5,7 +5,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
-import { Badge } from '@/components/ui/badge';
 import {
   Tooltip,
   TooltipContent,
@@ -39,27 +38,31 @@ export const Navigation = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-card/80 backdrop-blur-lg border-b border-border">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-2xl border-b border-border/50">
+      {/* Gradient accent line at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <button
             onClick={() => navigate('/')}
-            className="flex items-center space-x-2 hover:opacity-80 transition-opacity"
+            className="flex items-center space-x-2 group"
           >
-            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">CK</span>
+            <div className="w-10 h-10 bg-gradient-primary rounded-lg flex items-center justify-center shadow-glow-sm group-hover:shadow-glow transition-all duration-300 group-hover:scale-105">
+              <span className="text-primary-foreground font-bold text-xl">CK</span>
             </div>
-            <span className="text-xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+            <span className="text-xl font-bold text-gradient">
               CodeKick
             </span>
           </button>
 
           {user && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/domains')}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <Home className="w-4 h-4 mr-2" />
                 Domains
@@ -68,6 +71,7 @@ export const Navigation = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/discover')}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <Search className="w-4 h-4 mr-2" />
                 Discover
@@ -80,15 +84,15 @@ export const Navigation = () => {
                       variant="ghost"
                       size="sm"
                       onClick={() => navigate('/verify-phone')}
-                      className="relative"
+                      className="relative text-muted-foreground hover:text-foreground"
                     >
                       <Phone className="w-4 h-4" />
                       {phoneVerified !== null && (
                         <span className="absolute -top-1 -right-1">
                           {phoneVerified ? (
-                            <CheckCircle className="w-3 h-3 text-green-500" />
+                            <CheckCircle className="w-3 h-3 text-success" />
                           ) : (
-                            <AlertCircle className="w-3 h-3 text-yellow-500" />
+                            <AlertCircle className="w-3 h-3 text-accent" />
                           )}
                         </span>
                       )}
@@ -103,6 +107,7 @@ export const Navigation = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => navigate('/profile')}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <User className="w-4 h-4 mr-2" />
                 Profile
@@ -111,6 +116,7 @@ export const Navigation = () => {
                 variant="ghost"
                 size="sm"
                 onClick={signOut}
+                className="text-muted-foreground hover:text-foreground"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sign Out
