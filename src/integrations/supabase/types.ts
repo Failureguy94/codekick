@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_topics: {
+        Row: {
+          created_at: string | null
+          id: string
+          notes: string
+          topic: string
+          updated_at: string | null
+          user_id: string
+          videos: Json | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          notes: string
+          topic: string
+          updated_at?: string | null
+          user_id: string
+          videos?: Json | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          notes?: string
+          topic?: string
+          updated_at?: string | null
+          user_id?: string
+          videos?: Json | null
+        }
+        Relationships: []
+      }
       otp_verifications: {
         Row: {
           attempts: number | null
