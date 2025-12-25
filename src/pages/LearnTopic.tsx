@@ -12,6 +12,7 @@ import TopicSearchInput from '@/components/learn/TopicSearchInput';
 import NotesDisplay from '@/components/learn/NotesDisplay';
 import VideoCard from '@/components/learn/VideoCard';
 import TopicHistorySidebar from '@/components/learn/TopicHistorySidebar';
+import FocusAreaChips from '@/components/learn/FocusAreaChips';
 
 interface GeneratedContent {
   notes: string;
@@ -60,6 +61,16 @@ const LearnTopic = () => {
 
       const data = await response.json();
       setContent(data);
+      
+      // Track activity for heatmap
+      if (user) {
+        await supabase.rpc('increment_learning_activity', {
+          p_user_id: user.id,
+          p_topics_count: 1,
+          p_notes_generated: 0,
+        });
+      }
+      
       toast.success('Notes generated successfully!');
     } catch (error) {
       console.error('Error generating notes:', error);
@@ -88,6 +99,14 @@ const LearnTopic = () => {
       });
 
       if (error) throw error;
+      
+      // Track activity for heatmap
+      await supabase.rpc('increment_learning_activity', {
+        p_user_id: user.id,
+        p_topics_count: 0,
+        p_notes_generated: 1,
+      });
+      
       toast.success('Topic saved to your library!');
       setRefreshSidebar(prev => prev + 1);
     } catch (error) {
@@ -176,7 +195,7 @@ const LearnTopic = () => {
                 exit={{ opacity: 0 }}
               >
                 {/* Topic Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
                   <div className="flex items-center gap-3">
                     <Button
                       variant="ghost"
@@ -213,6 +232,9 @@ const LearnTopic = () => {
                     )}
                   </Button>
                 </div>
+
+                {/* Focus Areas */}
+                <FocusAreaChips topic={currentTopic} />
 
                 {/* Content Grid */}
                 <div className="grid lg:grid-cols-3 gap-8">

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Home, User, Search, LogOut, Phone, CheckCircle, AlertCircle, BookOpen } from 'lucide-react';
+import { Home, User, Search, LogOut, Phone, CheckCircle, AlertCircle, BookOpen, Flame, Sparkles } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
@@ -61,10 +61,19 @@ export const Navigation = () => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => navigate('/domains')}
+                onClick={() => navigate('/dashboard')}
                 className="text-muted-foreground hover:text-foreground"
               >
                 <Home className="w-4 h-4 mr-2" />
+                Dashboard
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/domains')}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <BookOpen className="w-4 h-4 mr-2" />
                 Domains
               </Button>
               <Button
@@ -73,8 +82,17 @@ export const Navigation = () => {
                 onClick={() => navigate('/learn')}
                 className="text-muted-foreground hover:text-foreground"
               >
-                <BookOpen className="w-4 h-4 mr-2" />
+                <Search className="w-4 h-4 mr-2" />
                 Learn
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate('/track')}
+                className="text-muted-foreground hover:text-foreground"
+              >
+                <Flame className="w-4 h-4 mr-2" />
+                Track
               </Button>
               <Button
                 variant="ghost"
@@ -82,7 +100,7 @@ export const Navigation = () => {
                 onClick={() => navigate('/discover')}
                 className="text-muted-foreground hover:text-foreground"
               >
-                <Search className="w-4 h-4 mr-2" />
+                <Sparkles className="w-4 h-4 mr-2" />
                 Discover
               </Button>
               <ThemeToggle />
