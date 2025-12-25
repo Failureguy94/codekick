@@ -41,6 +41,36 @@ export type Database = {
         }
         Relationships: []
       }
+      learning_activity: {
+        Row: {
+          activity_date: string
+          created_at: string | null
+          id: string
+          notes_generated: number | null
+          topics_count: number | null
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_date?: string
+          created_at?: string | null
+          id?: string
+          notes_generated?: number | null
+          topics_count?: number | null
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_date?: string
+          created_at?: string | null
+          id?: string
+          notes_generated?: number | null
+          topics_count?: number | null
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       learning_topics: {
         Row: {
           created_at: string | null
@@ -259,6 +289,14 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_otps: { Args: never; Returns: undefined }
+      increment_learning_activity: {
+        Args: {
+          p_notes_generated?: number
+          p_topics_count?: number
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

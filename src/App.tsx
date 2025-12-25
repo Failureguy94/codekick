@@ -25,6 +25,8 @@ import Web3Insights from "./pages/web3/Web3Insights";
 import Web2Track from "./pages/web2/Web2Track";
 import LearnTopic from "./pages/LearnTopic";
 import MyTopics from "./pages/MyTopics";
+import Dashboard from "./pages/Dashboard";
+import Track from "./pages/Track";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -66,6 +68,8 @@ const App = () => (
           {/* Learn Topic Routes */}
           <Route path="/learn" element={<ProtectedRoute><LearnTopic /></ProtectedRoute>} />
           <Route path="/my-topics" element={<ProtectedRoute><MyTopics /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+          <Route path="/track" element={<ProtectedRoute><Track /></ProtectedRoute>} />
           
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
