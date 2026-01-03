@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,9 +7,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardContent } from '@/components/ui/card';
-import { Chrome } from 'lucide-react';
+import { Card } from '@/components/ui/card';
 import { Navigation } from '@/components/Navigation';
+import { Turnstile } from '@marsidev/react-turnstile';
+import { Shield } from 'lucide-react';
+
+// Turnstile site key - this is public and safe to expose
+const TURNSTILE_SITE_KEY = '0x4AAAAAAAgS7Pz7KlPJf9Em';
+
+interface SecurityCheckResponse {
+  allowed: boolean;
+  requireCaptcha: boolean;
+  reason?: string;
+  lockoutMinutes?: number;
+}
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -18,12 +29,93 @@ const Auth = () => {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
+  
+  // Security states
+  const [showCaptcha, setShowCaptcha] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [securityMessage, setSecurityMessage] = useState<string | null>(null);
+
+  // Reset captcha when email changes
+  useEffect(() => {
+    setShowCaptcha(false);
+    setCaptchaToken(null);
+    setSecurityMessage(null);
+  }, [email]);
+
+  const checkSecurity = async (endpoint: 'login' | 'register'): Promise<SecurityCheckResponse> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('auth-security', {
+        body: { action: 'check', endpoint, email: endpoint === 'login' ? email : undefined }
+      });
+      
+      if (error) throw error;
+      return data as SecurityCheckResponse;
+    } catch (error) {
+      console.error('Security check failed:', error);
+      // Allow the request if security check fails (fail-open for availability)
+      return { allowed: true, requireCaptcha: false };
+    }
+  };
+
+  const recordAttempt = async (endpoint: 'login' | 'register', success: boolean) => {
+    try {
+      await supabase.functions.invoke('auth-security', {
+        body: { action: 'record', endpoint, email, success }
+      });
+    } catch (error) {
+      console.error('Failed to record attempt:', error);
+    }
+  };
+
+  const verifyCaptcha = async (token: string): Promise<boolean> => {
+    try {
+      const { data, error } = await supabase.functions.invoke('auth-security', {
+        body: { action: 'verify-captcha', captchaToken: token }
+      });
+      
+      if (error) throw error;
+      return data?.success === true;
+    } catch (error) {
+      console.error('CAPTCHA verification failed:', error);
+      return false;
+    }
+  };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSecurityMessage(null);
 
     try {
+      // Security check
+      const security = await checkSecurity('register');
+      
+      if (!security.allowed) {
+        setSecurityMessage(security.reason || 'Registration temporarily unavailable.');
+        toast.error(security.reason || 'Registration temporarily unavailable.');
+        setLoading(false);
+        return;
+      }
+
+      if (security.requireCaptcha && !captchaToken) {
+        setShowCaptcha(true);
+        setSecurityMessage('Please complete the security verification.');
+        setLoading(false);
+        return;
+      }
+
+      // Verify CAPTCHA if required
+      if (security.requireCaptcha && captchaToken) {
+        const captchaValid = await verifyCaptcha(captchaToken);
+        if (!captchaValid) {
+          toast.error('Security verification failed. Please try again.');
+          setCaptchaToken(null);
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -36,10 +128,12 @@ const Auth = () => {
         },
       });
 
+      // Record the attempt
+      await recordAttempt('register', !error);
+
       if (error) throw error;
 
       if (data.user) {
-        // Check if phone is verified
         const { data: profile } = await supabase
           .from('profiles')
           .select('phone_verified')
@@ -54,8 +148,14 @@ const Auth = () => {
           navigate('/');
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign up');
+    } catch (error: unknown) {
+      // Generic error message to prevent user existence leaks
+      const errorMessage = error instanceof Error ? error.message : 'Registration failed';
+      if (errorMessage.includes('already registered')) {
+        toast.error('Unable to complete registration. Please try again.');
+      } else {
+        toast.error('Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -64,16 +164,64 @@ const Auth = () => {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setSecurityMessage(null);
 
     try {
+      // Security check
+      const security = await checkSecurity('login');
+      
+      if (!security.allowed) {
+        setSecurityMessage(security.reason || 'Login temporarily unavailable.');
+        toast.error(security.reason || 'Login temporarily unavailable.');
+        setLoading(false);
+        return;
+      }
+
+      if (security.requireCaptcha && !captchaToken) {
+        setShowCaptcha(true);
+        setSecurityMessage('Please complete the security verification.');
+        setLoading(false);
+        return;
+      }
+
+      // Verify CAPTCHA if required
+      if (security.requireCaptcha && captchaToken) {
+        const captchaValid = await verifyCaptcha(captchaToken);
+        if (!captchaValid) {
+          toast.error('Security verification failed. Please try again.');
+          setCaptchaToken(null);
+          setLoading(false);
+          return;
+        }
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      // Record the attempt
+      const success = !error;
+      await recordAttempt('login', success);
 
-      // Check if phone is verified
+      if (error) {
+        // Increment local failed attempts counter for CAPTCHA trigger
+        const newFailedAttempts = failedAttempts + 1;
+        setFailedAttempts(newFailedAttempts);
+        
+        if (newFailedAttempts >= 3) {
+          setShowCaptcha(true);
+        }
+        
+        // Generic error message - don't reveal if user exists or not
+        throw new Error('Invalid credentials');
+      }
+
+      // Reset failed attempts on success
+      setFailedAttempts(0);
+      setShowCaptcha(false);
+      setCaptchaToken(null);
+
       if (data.user) {
         const { data: profile } = await supabase
           .from('profiles')
@@ -89,28 +237,22 @@ const Auth = () => {
           navigate('/');
         }
       }
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in');
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Invalid credentials';
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGoogleSignIn = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/verify-phone`,
-        },
-      });
+  const handleCaptchaSuccess = (token: string) => {
+    setCaptchaToken(token);
+    setSecurityMessage(null);
+  };
 
-      if (error) throw error;
-    } catch (error: any) {
-      toast.error(error.message || 'Failed to sign in with Google');
-      setLoading(false);
-    }
+  const handleCaptchaError = () => {
+    setCaptchaToken(null);
+    setSecurityMessage('Security verification failed. Please try again.');
   };
 
   return (
@@ -142,27 +284,6 @@ const Auth = () => {
 
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full bg-secondary/50 hover:bg-secondary border-border/50"
-                    onClick={handleGoogleSignIn}
-                    disabled={loading}
-                  >
-                    <Chrome className="w-5 h-5 mr-2" />
-                    Sign in with Google
-                  </Button>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border/50" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card/80 px-2 text-muted-foreground">
-                        Or continue with email
-                      </span>
-                    </div>
-                  </div>
                   <div>
                     <Label htmlFor="signin-email">Email</Label>
                     <Input
@@ -187,11 +308,32 @@ const Auth = () => {
                       className="bg-secondary/30 border-border/50 focus:border-primary/50"
                     />
                   </div>
+
+                  {/* Security message */}
+                  {securityMessage && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm">
+                      <Shield className="w-4 h-4 flex-shrink-0" />
+                      <span>{securityMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Conditional CAPTCHA */}
+                  {showCaptcha && (
+                    <div className="flex justify-center py-2">
+                      <Turnstile
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onSuccess={handleCaptchaSuccess}
+                        onError={handleCaptchaError}
+                        onExpire={() => setCaptchaToken(null)}
+                      />
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
                     variant="glow"
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || (showCaptcha && !captchaToken)}
                   >
                     {loading ? 'Signing in...' : 'Sign In'}
                   </Button>
@@ -200,27 +342,6 @@ const Auth = () => {
 
               <TabsContent value="signup">
                 <form onSubmit={handleSignUp} className="space-y-4">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full bg-secondary/50 hover:bg-secondary border-border/50"
-                    onClick={handleGoogleSignIn}
-                    disabled={loading}
-                  >
-                    <Chrome className="w-5 h-5 mr-2" />
-                    Sign up with Google
-                  </Button>
-
-                  <div className="relative">
-                    <div className="absolute inset-0 flex items-center">
-                      <span className="w-full border-t border-border/50" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-card/80 px-2 text-muted-foreground">
-                        Or create account with email
-                      </span>
-                    </div>
-                  </div>
                   <div>
                     <Label htmlFor="fullname">Full Name</Label>
                     <Input
@@ -270,11 +391,32 @@ const Auth = () => {
                       className="bg-secondary/30 border-border/50 focus:border-primary/50"
                     />
                   </div>
+
+                  {/* Security message */}
+                  {securityMessage && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-sm">
+                      <Shield className="w-4 h-4 flex-shrink-0" />
+                      <span>{securityMessage}</span>
+                    </div>
+                  )}
+
+                  {/* Conditional CAPTCHA */}
+                  {showCaptcha && (
+                    <div className="flex justify-center py-2">
+                      <Turnstile
+                        siteKey={TURNSTILE_SITE_KEY}
+                        onSuccess={handleCaptchaSuccess}
+                        onError={handleCaptchaError}
+                        onExpire={() => setCaptchaToken(null)}
+                      />
+                    </div>
+                  )}
+
                   <Button
                     type="submit"
                     variant="glow"
                     className="w-full"
-                    disabled={loading}
+                    disabled={loading || (showCaptcha && !captchaToken)}
                   >
                     {loading ? 'Creating account...' : 'Create Account'}
                   </Button>
