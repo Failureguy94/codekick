@@ -141,9 +141,12 @@ export type Database = {
           coding_platform: string | null
           country_code: string | null
           created_at: string | null
+          failed_login_attempts: number | null
           full_name: string | null
           id: string
+          last_failed_attempt: string | null
           linkedin: string | null
+          locked_until: string | null
           phone_number: string | null
           phone_verified: boolean | null
           telegram: string | null
@@ -156,9 +159,12 @@ export type Database = {
           coding_platform?: string | null
           country_code?: string | null
           created_at?: string | null
+          failed_login_attempts?: number | null
           full_name?: string | null
           id: string
+          last_failed_attempt?: string | null
           linkedin?: string | null
+          locked_until?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           telegram?: string | null
@@ -171,14 +177,44 @@ export type Database = {
           coding_platform?: string | null
           country_code?: string | null
           created_at?: string | null
+          failed_login_attempts?: number | null
           full_name?: string | null
           id?: string
+          last_failed_attempt?: string | null
           linkedin?: string | null
+          locked_until?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           telegram?: string | null
           updated_at?: string | null
           username?: string
+        }
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          attempts: number | null
+          created_at: string | null
+          endpoint: string
+          id: string
+          ip_address: string
+          window_start: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string | null
+          endpoint: string
+          id?: string
+          ip_address: string
+          window_start?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string | null
+          endpoint?: string
+          id?: string
+          ip_address?: string
+          window_start?: string | null
         }
         Relationships: []
       }
@@ -289,6 +325,7 @@ export type Database = {
     }
     Functions: {
       cleanup_expired_otps: { Args: never; Returns: undefined }
+      cleanup_expired_rate_limits: { Args: never; Returns: undefined }
       increment_learning_activity: {
         Args: {
           p_notes_generated?: number
