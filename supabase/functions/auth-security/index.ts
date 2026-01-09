@@ -22,7 +22,7 @@ const CAPTCHA_THRESHOLD = 3;
 
 interface SecurityCheckRequest {
   action: "check" | "record" | "verify-captcha";
-  email?: string;
+  username?: string;
   endpoint?: "login" | "register";
   success?: boolean;
   captchaToken?: string;
@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
                      "unknown";
 
     const body: SecurityCheckRequest = await req.json();
-    const { action, email, endpoint, success, captchaToken } = body;
+    const { action, username, endpoint, success, captchaToken } = body;
 
     console.log(`Auth security check: action=${action}, endpoint=${endpoint}, ip=${clientIP}`);
 
@@ -124,34 +124,40 @@ Deno.serve(async (req) => {
         }
       }
 
-      // Check account-specific status for login
-      if (endpoint === "login" && email) {
-        const { data: profile } = await supabase
-          .from("profiles")
-          .select("id, failed_login_attempts, locked_until")
-          .eq("id", (
-            await supabase.auth.admin.listUsers()
-          ).data.users.find(u => u.email === email)?.id || "")
-          .single();
+      // Check account-specific status for login using username
+      if (endpoint === "login" && username) {
+        // Convert username to fake email pattern (case-sensitive)
+        const fakeEmail = `${username}@codekick.local`;
+        
+        const { data: users } = await supabase.auth.admin.listUsers();
+        const user = users.users.find(u => u.email === fakeEmail);
 
-        if (profile) {
-          // Check if account is locked
-          if (profile.locked_until && new Date(profile.locked_until) > new Date()) {
-            const lockoutRemaining = Math.ceil(
-              (new Date(profile.locked_until).getTime() - Date.now()) / 60000
-            );
-            response.allowed = false;
-            response.reason = `Account temporarily locked. Try again in ${lockoutRemaining} minute(s).`;
-            response.lockoutMinutes = lockoutRemaining;
-            return new Response(JSON.stringify(response), {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
+        if (user) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("id, failed_login_attempts, locked_until")
+            .eq("id", user.id)
+            .single();
 
-          // Check if approaching lockout (trigger CAPTCHA)
-          if (profile.failed_login_attempts >= CAPTCHA_THRESHOLD) {
-            response.requireCaptcha = true;
-            response.reason = "Security verification required";
+          if (profile) {
+            // Check if account is locked
+            if (profile.locked_until && new Date(profile.locked_until) > new Date()) {
+              const lockoutRemaining = Math.ceil(
+                (new Date(profile.locked_until).getTime() - Date.now()) / 60000
+              );
+              response.allowed = false;
+              response.reason = `Account temporarily locked. Try again in ${lockoutRemaining} minute(s).`;
+              response.lockoutMinutes = lockoutRemaining;
+              return new Response(JSON.stringify(response), {
+                headers: { ...corsHeaders, "Content-Type": "application/json" },
+              });
+            }
+
+            // Check if approaching lockout (trigger CAPTCHA)
+            if (profile.failed_login_attempts >= CAPTCHA_THRESHOLD) {
+              response.requireCaptcha = true;
+              response.reason = "Security verification required";
+            }
           }
         }
       }
@@ -190,10 +196,13 @@ Deno.serve(async (req) => {
           });
       }
 
-      // Update account-specific failed attempts for login
-      if (endpoint === "login" && email) {
+      // Update account-specific failed attempts for login using username
+      if (endpoint === "login" && username) {
+        // Convert username to fake email pattern (case-sensitive)
+        const fakeEmail = `${username}@codekick.local`;
+        
         const { data: users } = await supabase.auth.admin.listUsers();
-        const user = users.users.find(u => u.email === email);
+        const user = users.users.find(u => u.email === fakeEmail);
 
         if (user) {
           if (success) {
