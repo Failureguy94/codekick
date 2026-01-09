@@ -22,10 +22,20 @@ interface SecurityCheckResponse {
   lockoutMinutes?: number;
 }
 
+// Username validation helper
+const validateUsername = (username: string): string | null => {
+  if (username.length < 3) {
+    return 'Username must be at least 3 characters';
+  }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) {
+    return 'Username can only contain letters, numbers, and underscores';
+  }
+  return null;
+};
+
 const Auth = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [fullName, setFullName] = useState('');
@@ -36,17 +46,17 @@ const Auth = () => {
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [securityMessage, setSecurityMessage] = useState<string | null>(null);
 
-  // Reset captcha when email changes
+  // Reset captcha when username changes
   useEffect(() => {
     setShowCaptcha(false);
     setCaptchaToken(null);
     setSecurityMessage(null);
-  }, [email]);
+  }, [username]);
 
   const checkSecurity = async (endpoint: 'login' | 'register'): Promise<SecurityCheckResponse> => {
     try {
       const { data, error } = await supabase.functions.invoke('auth-security', {
-        body: { action: 'check', endpoint, email: endpoint === 'login' ? email : undefined }
+        body: { action: 'check', endpoint, username: endpoint === 'login' ? username.trim() : undefined }
       });
       
       if (error) throw error;
@@ -61,7 +71,7 @@ const Auth = () => {
   const recordAttempt = async (endpoint: 'login' | 'register', success: boolean) => {
     try {
       await supabase.functions.invoke('auth-security', {
-        body: { action: 'record', endpoint, email, success }
+        body: { action: 'record', endpoint, username: username.trim(), success }
       });
     } catch (error) {
       console.error('Failed to record attempt:', error);
@@ -86,6 +96,14 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setSecurityMessage(null);
+
+    // Validate username
+    const usernameError = validateUsername(username.trim());
+    if (usernameError) {
+      toast.error(usernameError);
+      setLoading(false);
+      return;
+    }
 
     try {
       // Security check
@@ -116,12 +134,15 @@ const Auth = () => {
         }
       }
 
+      // Convert username to fake email for Supabase Auth (case-preserving)
+      const fakeEmail = `${username.trim()}@codekick.local`;
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: fakeEmail,
         password,
         options: {
           data: {
-            username,
+            username: username.trim(),
             full_name: fullName,
           },
           emailRedirectTo: `${window.location.origin}/`,
@@ -152,7 +173,7 @@ const Auth = () => {
       // Generic error message to prevent user existence leaks
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
       if (errorMessage.includes('already registered')) {
-        toast.error('Unable to complete registration. Please try again.');
+        toast.error('Username is already taken. Please choose another.');
       } else {
         toast.error('Registration failed. Please try again.');
       }
@@ -165,6 +186,14 @@ const Auth = () => {
     e.preventDefault();
     setLoading(true);
     setSecurityMessage(null);
+
+    // Validate username
+    const usernameError = validateUsername(username.trim());
+    if (usernameError) {
+      toast.error(usernameError);
+      setLoading(false);
+      return;
+    }
 
     try {
       // Security check
@@ -195,8 +224,11 @@ const Auth = () => {
         }
       }
 
+      // Convert username to fake email for Supabase Auth (case-preserving)
+      const fakeEmail = `${username.trim()}@codekick.local`;
+
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
+        email: fakeEmail,
         password,
       });
 
@@ -285,16 +317,17 @@ const Auth = () => {
               <TabsContent value="signin">
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div>
-                    <Label htmlFor="signin-email">Email</Label>
+                    <Label htmlFor="signin-username">Username</Label>
                     <Input
-                      id="signin-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
+                      id="signin-username"
+                      type="text"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
                       required
-                      placeholder="you@example.com"
+                      placeholder="your_username"
                       className="bg-secondary/30 border-border/50 focus:border-primary/50"
                     />
+                    <p className="text-xs text-muted-foreground mt-1">Username is case-sensitive</p>
                   </div>
                   <div>
                     <Label htmlFor="signin-password">Password</Label>
@@ -355,28 +388,17 @@ const Auth = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="username">Username</Label>
+                    <Label htmlFor="signup-username">Username</Label>
                     <Input
-                      id="username"
+                      id="signup-username"
                       type="text"
                       value={username}
                       onChange={(e) => setUsername(e.target.value)}
                       required
-                      placeholder="johndoe"
+                      placeholder="your_username"
                       className="bg-secondary/30 border-border/50 focus:border-primary/50"
                     />
-                  </div>
-                  <div>
-                    <Label htmlFor="signup-email">Email</Label>
-                    <Input
-                      id="signup-email"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      placeholder="you@example.com"
-                      className="bg-secondary/30 border-border/50 focus:border-primary/50"
-                    />
+                    <p className="text-xs text-muted-foreground mt-1">Case-sensitive • Letters, numbers, underscores only</p>
                   </div>
                   <div>
                     <Label htmlFor="signup-password">Password</Label>
