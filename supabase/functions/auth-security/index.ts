@@ -8,7 +8,7 @@ const corsHeaders = {
 // Rate limit configurations
 const RATE_LIMITS = {
   login: { maxAttempts: 5, windowMinutes: 1 },
-  register: { maxAttempts: 2, windowMinutes: 60 },
+  register: { maxAttempts: 10, windowMinutes: 2 },
 };
 
 // Account lockout configuration

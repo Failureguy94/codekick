@@ -172,7 +172,10 @@ const Auth = () => {
     } catch (error: unknown) {
       // Generic error message to prevent user existence leaks
       const errorMessage = error instanceof Error ? error.message : 'Registration failed';
-      if (errorMessage.includes('already registered')) {
+      if (errorMessage.includes('already registered') || 
+          errorMessage.includes('Database error saving new user') ||
+          errorMessage.includes('duplicate key') ||
+          errorMessage.includes('unique constraint')) {
         toast.error('Username is already taken. Please choose another.');
       } else {
         toast.error('Registration failed. Please try again.');
