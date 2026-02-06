@@ -28,7 +28,7 @@ export const AIChatbot = () => {
 
     const userMessage = input.trim();
     setInput('');
-    
+
     const newMessages: Message[] = [
       ...messages,
       { role: 'user', content: userMessage },
@@ -82,16 +82,14 @@ export const AIChatbot = () => {
                 {messages.map((msg, idx) => (
                   <div
                     key={idx}
-                    className={`flex ${
-                      msg.role === 'user' ? 'justify-end' : 'justify-start'
-                    }`}
+                    className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'
+                      }`}
                   >
                     <div
-                      className={`max-w-[80%] p-3 rounded-lg ${
-                        msg.role === 'user'
+                      className={`max-w-[80%] p-3 rounded-lg ${msg.role === 'user'
                           ? 'bg-primary text-primary-foreground'
                           : 'bg-muted'
-                      }`}
+                        }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                     </div>
@@ -117,7 +115,7 @@ export const AIChatbot = () => {
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  placeholder="Ask me anything..."
+                  placeholder="Let's learn something new, let's gooo"
                   disabled={loading}
                 />
                 <Button
@@ -143,12 +141,12 @@ export const AIChatbot = () => {
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-16 h-16 bg-gradient-to-br from-blue-500 via-purple-500 to-pink-500 rounded-full shadow-glow flex items-center justify-center group overflow-hidden"
+          className="relative w-16 h-16 bg-gradient-to-br from-red-500 via-red-600 to-rose-600 rounded-full shadow-glow flex items-center justify-center group overflow-hidden"
           animate={{
             boxShadow: [
-              "0 0 20px rgba(168, 85, 247, 0.4)",
-              "0 0 30px rgba(59, 130, 246, 0.6)",
-              "0 0 20px rgba(168, 85, 247, 0.4)",
+              "0 0 20px rgba(239, 68, 68, 0.6)",
+              "0 0 30px rgba(239, 68, 68, 0.8)",
+              "0 0 20px rgba(220, 38, 38, 0.6)",
             ],
           }}
           transition={{
@@ -172,7 +170,7 @@ export const AIChatbot = () => {
               ease: "easeInOut",
             }}
           />
-          
+
           {/* Icon */}
           <motion.div
             animate={{
