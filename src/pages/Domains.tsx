@@ -21,7 +21,7 @@ const domains: Domain[] = [
     id: "cp",
     name: "CP/DSA",
     icon: Code,
-    color: "from-blue-500 to-cyan-500",
+    color: "from-[#1a1a2e] to-[#16213e]",
     description: "Competitive Programming & Data Structures and Algorithms",
     advantages: [
       "Strong problem-solving skills",
@@ -41,7 +41,7 @@ const domains: Domain[] = [
     id: "aiml",
     name: "AI/ML",
     icon: Brain,
-    color: "from-purple-500 to-pink-500",
+    color: "from-[#2d132c] to-[#1a0a1a]",
     description: "Artificial Intelligence & Machine Learning",
     advantages: [
       "Cutting-edge technology field",
@@ -61,7 +61,7 @@ const domains: Domain[] = [
     id: "web3",
     name: "Web3",
     icon: Blocks,
-    color: "from-emerald-500 to-teal-500",
+    color: "from-[#0f2027] to-[#203a43]",
     description: "Blockchain & Decentralized Applications",
     advantages: [
       "Emerging technology",
@@ -81,7 +81,7 @@ const domains: Domain[] = [
     id: "web2",
     name: "Web2",
     icon: Globe2,
-    color: "from-orange-500 to-red-500",
+    color: "from-[#3d1c1c] to-[#1a0a0a]",
     description: "Traditional Web Development",
     advantages: [
       "Wide job market",
@@ -118,19 +118,25 @@ const DomainCard = ({ domain }: { domain: Domain }) => {
         onClick={() => navigate(`/${domain.id}`)}
       >
         {/* Front */}
-        <div className="absolute w-full h-full backface-hidden">
-          <div className={`h-full rounded-2xl bg-gradient-to-br ${domain.color} p-8 flex flex-col items-center justify-center text-primary-foreground shadow-elegant`}>
+        <div
+          className="absolute w-full h-full backface-hidden"
+          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+        >
+          <div className={`h-full rounded-2xl bg-gradient-to-br ${domain.color} p-8 flex flex-col items-center justify-center text-white shadow-elegant border border-white/10`}>
             <Icon className="w-20 h-20 mb-6" strokeWidth={1.5} />
             <h3 className="text-3xl font-bold mb-4">{domain.name}</h3>
-            <p className="text-center text-primary-foreground/90">{domain.description}</p>
+            <p className="text-center text-white/80">{domain.description}</p>
           </div>
         </div>
 
         {/* Back */}
-        <div className="absolute w-full h-full backface-hidden" style={{ transform: "rotateY(180deg)" }}>
-          <div className="h-full rounded-2xl glass-card border border-primary/20 p-6 overflow-y-auto">
+        <div
+          className="absolute w-full h-full backface-hidden"
+          style={{ transform: 'rotateY(180deg)', backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+        >
+          <div className="h-full rounded-2xl bg-card border border-border p-6 overflow-y-auto shadow-elegant">
             <h4 className="text-xl font-bold text-foreground mb-4">{domain.name} Overview</h4>
-            
+
             <div className="space-y-4">
               <div>
                 <h5 className="font-semibold text-success mb-2">Advantages:</h5>
@@ -175,11 +181,11 @@ const Domains = () => {
   return (
     <div className="min-h-screen bg-background bg-mesh py-12 px-4">
       <Navigation />
-      
+
       {/* Ambient effects */}
       <div className="fixed top-1/4 right-0 w-96 h-96 bg-primary/8 rounded-full blur-3xl pointer-events-none" />
       <div className="fixed bottom-0 left-1/4 w-80 h-80 bg-accent/8 rounded-full blur-3xl pointer-events-none" />
-      
+
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
