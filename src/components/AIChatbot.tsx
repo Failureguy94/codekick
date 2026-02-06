@@ -87,8 +87,8 @@ export const AIChatbot = () => {
                   >
                     <div
                       className={`max-w-[80%] p-3 rounded-lg ${msg.role === 'user'
-                          ? 'bg-primary text-primary-foreground'
-                          : 'bg-muted'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-muted'
                         }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
@@ -141,12 +141,12 @@ export const AIChatbot = () => {
           whileHover={{ scale: 1.1, rotate: 5 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => setIsOpen(!isOpen)}
-          className="relative w-16 h-16 bg-gradient-to-br from-red-500 via-red-600 to-rose-600 rounded-full shadow-glow flex items-center justify-center group overflow-hidden"
+          className="relative w-16 h-16 bg-gradient-to-br from-[#E83F6F] via-[#D63B64] to-[#C42F55] rounded-full shadow-glow flex items-center justify-center group overflow-hidden"
           animate={{
             boxShadow: [
-              "0 0 20px rgba(239, 68, 68, 0.6)",
-              "0 0 30px rgba(239, 68, 68, 0.8)",
-              "0 0 20px rgba(220, 38, 38, 0.6)",
+              "0 0 20px rgba(232, 63, 111, 0.6)",
+              "0 0 30px rgba(232, 63, 111, 0.8)",
+              "0 0 20px rgba(214, 59, 100, 0.6)",
             ],
           }}
           transition={{
